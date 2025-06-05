@@ -5,25 +5,25 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Department extends Model
+class Level extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'faculty_id',
+        'department_id',
         'name',
         'code',
+        'academic_year',
+        'semester',
         'description',
-        'head_name',
-        'head_email',
-        'location',
         'status',
         'created_by',
     ];
 
-    public function faculty()
+    // Relationships
+    public function department()
     {
-        return $this->belongsTo(Faculty::class);
+        return $this->belongsTo(Department::class);
     }
 
     public function creator()
@@ -31,18 +31,8 @@ class Department extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function levels()
-    {
-        return $this->hasMany(Level::class);
-    }
-
     public function logbooks()
     {
         return $this->hasMany(Logbook::class);
-    }
-
-    public function userAssignments()
-    {
-        return $this->hasMany(UserAssignment::class);
     }
 }

@@ -18,11 +18,18 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'username',
         'email',
         'password',
-        'type',
-        
+        'first_name',
+        'last_name',
+        'role',
+        'staff_id',
+        'phone',
+        'address',
+        'status',
+        'last_login_at',
+
 
     ];
 
@@ -47,5 +54,50 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function createdFaculties()
+    {
+        return $this->hasMany(Faculty::class, 'created_by');
+    }
+
+    public function createdDepartments()
+    {
+        return $this->hasMany(Department::class, 'created_by');
+    }
+
+    public function createdLevels()
+    {
+        return $this->hasMany(Level::class, 'created_by');
+    }
+
+    public function createdLogbooks()
+    {
+        return $this->hasMany(Logbook::class, 'creator_id');
+    }
+
+    public function logbookEntries()
+    {
+        return $this->hasMany(LogbookEntry::class, 'created_by');
+    }
+
+    public function revisedEntries()
+    {
+        return $this->hasMany(LogbookEntry::class, 'revised_by');
+    }
+
+    public function attachments()
+    {
+        return $this->hasMany(LogbookAttachment::class, 'uploaded_by');
+    }
+
+    public function createdTemplates()
+    {
+        return $this->hasMany(LogbookTemplate::class, 'created_by');
+    }
+
+    public function assignments()
+    {
+        return $this->hasMany(UserAssignment::class);
     }
 }

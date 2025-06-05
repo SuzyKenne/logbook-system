@@ -5,33 +5,28 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Faculty extends Model
+class LogbookTemplate extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'name',
-        'code',
         'description',
-        'dean_name',
-        'dean_email',
-        'location',
+        'field_configuration',
+        'template_type',
+        'is_default',
         'status',
         'created_by',
     ];
 
+    protected $casts = [
+        'field_configuration' => 'array',
+        'is_default' => 'boolean',
+    ];
+
+    // Relationships
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
-    }
-
-    public function departments()
-    {
-        return $this->hasMany(Department::class);
-    }
-
-    public function userAssignments()
-    {
-        return $this->hasMany(UserAssignment::class);
     }
 }
