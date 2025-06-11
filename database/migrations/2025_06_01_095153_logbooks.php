@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('department_id')->constrained('departments')->onDelete('cascade');
             $table->foreignId('level_id')->constrained('levels')->onDelete('cascade');
             $table->foreignId('creator_id')->constrained('users')->onDelete('restrict');
+            $table->foreignId('course_id')->nullable()->constrained('courses')->onDelete('cascade');
             $table->string('title');
             $table->text('description')->nullable();
             $table->string('course_code')->nullable();
@@ -30,6 +31,7 @@ return new class extends Migration
             $table->index(['department_id', 'level_id', 'status']);
             $table->index(['creator_id', 'status']);
             $table->index(['start_date', 'end_date']);
+            $table->index(['course_id', 'status']);
         });
     }
 
@@ -38,6 +40,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('logbooks');
+        Schema::table('logbooks', function (Blueprint $table) {
+            $table->dropForeign(['course_id']);
+            $table->dropIndex(['course_id', 'status']);
+            $table->dropColumn('course_id');
+        });
     }
 };

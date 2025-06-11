@@ -17,8 +17,8 @@ return new class extends Migration
             $table->foreignId('department_id')->constrained('departments')->onDelete('cascade');
             $table->string('name'); // e.g., "Year 1", "Level 100"
             $table->string('code'); // e.g., "Y1", "L100"
-            $table->integer('academic_year'); // e.g., 2024
-            $table->enum('semester', ['first', 'second', 'both'])->default('both');
+            $table->string('academic_year', 20); // e.g., 2024
+            $table->enum('semester', ['first', 'second']);
             $table->text('description')->nullable();
             $table->enum('status', ['active', 'inactive', 'archived'])->default('active');
             $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
