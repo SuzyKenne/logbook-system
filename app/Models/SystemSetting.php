@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SystemSetting extends Model
 {
-     use HasFactory;
+    use HasFactory;
 
     protected $fillable = [
         'key',
@@ -21,5 +21,4 @@ class SystemSetting extends Model
     protected $casts = [
         'is_public' => 'boolean',
     ];
-
 }
