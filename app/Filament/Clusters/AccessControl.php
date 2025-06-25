@@ -8,7 +8,9 @@ class AccessControl extends Cluster
 {
     protected static ?string $navigationIcon = 'heroicon-o-squares-2x2';
 
+    protected static ?string $navigationGroup = 'Access Controller';
+
     protected static ?string $navigationLabel = 'Settings';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 3;
 }

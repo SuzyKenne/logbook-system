@@ -23,7 +23,7 @@ class CourseResource extends Resource
 
     protected static ?string $navigationGroup = 'Academic Management';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
     {

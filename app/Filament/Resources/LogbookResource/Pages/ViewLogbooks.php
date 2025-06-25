@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\LogbookResource\Pages;
 
 use App\Filament\Resources\LogbookResource;
+use App\Services\LogbookReportService; // Add this import
 use Filament\Actions;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
@@ -25,29 +26,26 @@ class ViewLogbooks extends ViewRecord
                 // ]))
                 ->visible(fn() => $this->record->status === 'active'),
 
+            // Step 1: Add the report generation action to header actions
+            Actions\Action::make('generateReport')
+                ->label('Generate Progress Report')
+                ->icon('heroicon-m-document-arrow-down')
+                ->color('info')
+                ->action(function () {
+                    $reportService = new LogbookReportService();
+                    return $reportService->generateProgressReport($this->record);
+                })
+                ->requiresConfirmation()
+                ->modalHeading('Generate Progress Report')
+                ->modalDescription('This will create a detailed PDF report of all entries and progress for this logbook.')
+                ->modalSubmitActionLabel('Generate Report'),
+
             Actions\EditAction::make()
                 ->color('warning'),
 
             Actions\DeleteAction::make()
                 ->requiresConfirmation(),
 
-            Actions\Action::make('duplicate')
-                ->label('Duplicate Logbook')
-                ->icon('heroicon-m-document-duplicate')
-                ->color('info')
-                ->action(function () {
-                    $newLogbook = $this->record->replicate();
-                    $newLogbook->title = $this->record->title . ' (Copy)';
-                    $newLogbook->status = 'draft';
-                    $newLogbook->creator_id = auth()->id();
-                    $newLogbook->save();
-
-                    $this->redirect(LogbookResource::getUrl('edit', ['record' => $newLogbook]));
-                })
-                ->requiresConfirmation()
-                ->modalHeading('Duplicate Logbook')
-                ->modalDescription('This will create a copy of this logbook with all the same settings but no entries.')
-                ->modalSubmitActionLabel('Duplicate'),
         ];
     }
 
@@ -376,46 +374,8 @@ class ViewLogbooks extends ViewRecord
                     ->collapsible()
                     ->collapsed(),
 
-                Infolists\Components\Section::make('Quick Actions & Tools')
-                    ->description('Helpful actions and management tools')
-                    ->schema([
-                        Infolists\Components\Actions::make([
-                            Infolists\Components\Actions\Action::make('generateReport')
-                                ->label('Generate Progress Report')
-                                ->icon('heroicon-m-document-arrow-down')
-                                ->color('info')
-                                ->action(function ($record) {
-                                    // Logic to generate and download a progress report
-                                    // This could export to PDF, Excel, etc.
-                                })
-                                ->requiresConfirmation()
-                                ->modalHeading('Generate Progress Report')
-                                ->modalDescription('This will create a detailed report of all entries and progress for this logbook.'),
-
-                            Infolists\Components\Actions\Action::make('exportEntries')
-                                ->label('Export All Entries')
-                                ->icon('heroicon-m-arrow-down-tray')
-                                ->color('success')
-                                ->action(function ($record) {
-                                    // Logic to export all entries
-                                })
-                                ->visible(fn($record) => $record->entries()->count() > 0),
-
-                            Infolists\Components\Actions\Action::make('archiveLogbook')
-                                ->label('Archive Logbook')
-                                ->icon('heroicon-m-archive-box')
-                                ->color('warning')
-                                ->action(function ($record) {
-                                    $record->update(['status' => 'completed']);
-                                })
-                                ->visible(fn($record) => $record->status === 'active')
-                                ->requiresConfirmation()
-                                ->modalHeading('Archive This Logbook')
-                                ->modalDescription('This will mark the logbook as completed and archive it.'),
-                        ]),
-                    ])
-                    ->collapsible()
-                    ->collapsed(),
+                // Step 2: Remove the Quick Actions section that was causing the error
+                // The actions are now properly placed in the header actions above
             ]);
     }
 

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Storage;
 
 class Staff extends Model
 {
@@ -29,6 +30,7 @@ class Staff extends Model
         'office_location',
         'office_phone',
         'bio',
+        'profile_image',
         'is_head_of_department',
         'is_dean',
     ];
@@ -37,6 +39,11 @@ class Staff extends Model
         'is_head_of_department' => 'boolean',
         'is_dean' => 'boolean',
         'hire_date' => 'date', // Add this cast since you're using hire_date in your Filament form
+    ];
+
+    protected $appends = [
+        'profile_image_url',
+        'profile_image_thumbnail_url',
     ];
 
     // Relationships
@@ -65,6 +72,62 @@ class Staff extends Model
     public function logbooks(): HasMany
     {
         return $this->hasMany(Logbook::class, 'assigned_staff_id');
+    }
+
+    // Image Accessors
+    public function getProfileImageUrlAttribute(): ?string
+    {
+        if (!$this->profile_image) {
+            return $this->getDefaultProfileImage();
+        }
+
+        return Storage::disk('public')->url($this->profile_image);
+    }
+
+    public function getProfileImageThumbnailUrlAttribute(): ?string
+    {
+        if (!$this->profile_image) {
+            return $this->getDefaultProfileImage();
+        }
+
+        // If you have thumbnail generation logic, add it here
+        // For now, return the original image
+        return Storage::disk('public')->url($this->profile_image);
+    }
+
+    public function getDefaultProfileImage(): string
+    {
+        // Return a default avatar image
+        return asset('images/default-avatar.png');
+    }
+
+    public function hasProfileImage(): bool
+    {
+        return !empty($this->profile_image) && Storage::disk('public')->exists($this->profile_image);
+    }
+
+    // Image Management Methods
+    public function deleteProfileImage(): bool
+    {
+        if ($this->profile_image && Storage::disk('public')->exists($this->profile_image)) {
+            Storage::disk('public')->delete($this->profile_image);
+            $this->profile_image = null;
+            $this->profile_image_alt = null;
+            return $this->save();
+        }
+        return false;
+    }
+
+    public function updateProfileImage(string $imagePath, ?string $altText = null): bool
+    {
+        // Delete old image if exists
+        if ($this->profile_image && $this->profile_image !== $imagePath) {
+            $this->deleteProfileImage();
+        }
+
+        $this->profile_image = $imagePath;
+        $this->profile_image_alt = $altText ?? $this->getFullNameAttribute() . ' profile image';
+        return $this->save();
     }
 
     // Scopes
@@ -98,10 +161,28 @@ class Staff extends Model
         return $query->where('department_id', $departmentId);
     }
 
+    public function scopeWithImages($query)
+    {
+        return $query->whereNotNull('profile_image');
+    }
+
+    public function scopeWithoutImages($query)
+    {
+        return $query->whereNull('profile_image');
+    }
+
     // Helper Methods
     public function getFullNameAttribute()
     {
         return $this->user->first_name . ' ' . $this->user->last_name;
+    }
+
+    public function getInitialsAttribute(): string
+    {
+        $firstName = $this->user->first_name ?? '';
+        $lastName = $this->user->last_name ?? '';
+
+        return strtoupper(substr($firstName, 0, 1) . substr($lastName, 0, 1));
     }
 
     public function isDean(): bool
@@ -180,5 +261,16 @@ class Staff extends Model
 
         // Lecturers can only see their own logbooks
         return $this->logbooks();
+    }
+
+    // Model Events
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($staff) {
+            // Delete profile image when staff is deleted
+            $staff->deleteProfileImage();
+        });
     }
 }

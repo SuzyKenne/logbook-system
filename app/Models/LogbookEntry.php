@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class LogbookEntry extends Model
 {
-     use HasFactory;
+    use HasFactory;
 
     protected $fillable = [
         'logbook_id',
@@ -34,7 +34,7 @@ class LogbookEntry extends Model
         'revised_at' => 'datetime',
     ];
 
-     // Relationships
+    // Relationships
     public function logbook()
     {
         return $this->belongsTo(Logbook::class);
@@ -53,5 +53,10 @@ class LogbookEntry extends Model
     public function attachments()
     {
         return $this->hasMany(LogbookAttachment::class);
+    }
+    public function getEncodedAttribute($key)
+    {
+        $value = $this->attributes[$key] ?? '';
+        return mb_convert_encoding($value, 'UTF-8', 'UTF-8');
     }
 }
