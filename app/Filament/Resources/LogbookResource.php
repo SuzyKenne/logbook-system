@@ -127,7 +127,7 @@ class LogbookResource extends Resource
                         Forms\Components\Select::make('logbook_type')
                             ->label('Logbook Type')
                             ->options([
-                                'laboratory' => 'Laboratory Sessions',
+                                'lab' => 'Laboratory Sessions',
                                 'field_work' => 'Field Work',
                                 'practical' => 'Practical Sessions',
                                 'workshop' => 'Workshop Activities',
@@ -136,8 +136,8 @@ class LogbookResource extends Resource
                                 'research' => 'Research Activities',
                                 'seminar' => 'Seminar Sessions',
                             ])
-                            ->required()
-                            ->default('laboratory')
+                            // ->required()
+                            ->default('lab')
                             ->columnSpanFull(),
                     ]),
 

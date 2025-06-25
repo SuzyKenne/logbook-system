@@ -24,15 +24,7 @@ class LogbookReportService
     {
         try {
             // Step 2: Gather all necessary data with UTF-8 cleaning
-            // $data = $logbook->toArray();
-            // dd($logbook);
-
-            $entry = LogbookEntry::where('logbook_id', $logbook->id)->first();
-
-            $data = $logbook->toArray();
-
-            // dd($data);
-
+            $data = $this->prepareReportData($logbook);
 
             // Step 3: Create PDF with proper UTF-8 configuration
             $pdf = Pdf::loadView('reports.logbook-progress', $data)

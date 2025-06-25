@@ -31,14 +31,15 @@ class ViewLogbooks extends ViewRecord
                 ->label('Generate Progress Report')
                 ->icon('heroicon-m-document-arrow-down')
                 ->color('info')
-                ->action(function () {
-                    $reportService = new LogbookReportService();
-                    return $reportService->generateProgressReport($this->record);
-                })
                 ->requiresConfirmation()
                 ->modalHeading('Generate Progress Report')
                 ->modalDescription('This will create a detailed PDF report of all entries and progress for this logbook.')
-                ->modalSubmitActionLabel('Generate Report'),
+                ->modalSubmitActionLabel('Generate Report')
+                ->action(function ($record) {
+                    return redirect()->to(route('logbook.progress-report', $record));
+                })
+                ->openUrlInNewTab(),
+
 
             Actions\EditAction::make()
                 ->color('warning'),

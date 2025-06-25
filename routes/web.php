@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
+use App\Models\Logbook;
+use App\Services\LogbookReportService;
 
 // Authentication Routes
 Route::middleware('guest')->group(function () {
@@ -42,3 +44,8 @@ Route::middleware('auth')->group(function () {
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
+
+Route::get('/logbook/{logbook}/progress-report', function (Logbook $logbook) {
+    $service = new LogbookReportService();
+    return $service->generateProgressReport($logbook);
+})->name('logbook.progress-report');
