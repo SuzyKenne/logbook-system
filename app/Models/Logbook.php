@@ -49,4 +49,10 @@ class Logbook extends Model
     {
         return $this->hasMany(LogbookEntry::class);
     }
+
+    public function getEncodedAttribute($key)
+    {
+        $value = $this->attributes[$key] ?? '';
+        return mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+    }
 }

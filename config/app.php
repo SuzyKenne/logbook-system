@@ -123,4 +123,12 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'charset' => 'UTF-8',
+    // 'providers' => [
+    //     // ...
+    //     Barryvdh\DomPDF\ServiceProvider::class,
+    // ],
+
+
+
 ];
